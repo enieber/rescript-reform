@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@rescript/react": "^0.10.1",
+    "@rescriptbr/reform": "^11.0.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -11,6 +12,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.2",
+    "reschema": "^2.2.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -40,6 +42,7 @@
   },
   "devDependencies": {
     "bs-platform": "^9.0.0",
-    "gentype": "^3.43.0"
+    "gentype": "^3.43.0",
+    "lenses-ppx": "^6.1.10"
   }
 }

@@ -2,39 +2,78 @@
 
 import * as Curry from "bs-platform/lib/es6/curry.mjs";
 import * as React from "react";
+import * as ReForm from "@rescriptbr/reform/src/ReForm.bs.js";
+import * as ReForm__Helpers from "@rescriptbr/reform/src/ReForm__Helpers.bs.js";
+
+function get(values, field) {
+  return values.tag;
+}
+
+function set(values, field, value) {
+  return {
+          tag: value
+        };
+}
+
+var FormFields = {
+  get: get,
+  set: set
+};
+
+var UserForm = ReForm.Make({
+      set: set,
+      get: get
+    });
 
 function AddTag(Props) {
   var recipeTitle = Props.recipeTitle;
   var dispatch = Props.dispatch;
-  var match = React.useState(function () {
-        return "";
-      });
-  var setTag = match[1];
-  var tag = match[0];
-  return React.createElement("div", undefined, React.createElement("input", {
-                  placeholder: "Add tag...",
-                  value: tag,
-                  onChange: (function ($$event) {
-                      var tag = $$event.target.value;
-                      return Curry._1(setTag, (function (param) {
-                                    return tag;
-                                  }));
-                    })
-                }), React.createElement("button", {
-                  onClick: (function (param) {
-                      return Curry._1(dispatch, {
-                                  TAG: /* AddTag */1,
-                                  recipeTitle: recipeTitle,
-                                  tag: tag
-                                });
-                    })
-                }, "Add Tag!"));
+  var inputTag = React.useRef(null);
+  var form = Curry._7(UserForm.use, {
+        tag: ""
+      }, /* Schema */{
+        _0: Curry._3(UserForm.ReSchema.Validation.nonEmpty, undefined, undefined, /* Tag */0)
+      }, (function (state) {
+          console.log(state);
+          
+        }), undefined, undefined, /* OnChange */0, undefined);
+  var partial_arg = Curry._1(form.handleChange, /* Tag */0);
+  return React.createElement("form", {
+              onSubmit: (function ($$event) {
+                  $$event.preventDefault();
+                  var dom = inputTag.current;
+                  if (!(dom == null)) {
+                    dom.focus();
+                  }
+                  Curry._1(dispatch, {
+                        TAG: /* AddTag */1,
+                        recipeTitle: recipeTitle,
+                        tag: form.values.tag
+                      });
+                  Curry._1(form.submit, undefined);
+                  return Curry._1(form.resetForm, undefined);
+                })
+            }, React.createElement("div", undefined, React.createElement("label", undefined, "Tag"), React.createElement("input", {
+                      ref: inputTag,
+                      placeholder: "Add tag...",
+                      type: "text",
+                      value: form.values.tag,
+                      onChange: (function (param) {
+                          return ReForm__Helpers.handleChange(partial_arg, param);
+                        })
+                    })), React.createElement("button", {
+                  className: "button",
+                  disabled: form.formState === /* Submitting */1,
+                  type: "submit"
+                }, "Adicionar"));
 }
 
 var make = AddTag;
 
 export {
+  FormFields ,
+  UserForm ,
   make ,
   
 }
-/* react Not a pure module */
+/* UserForm Not a pure module */

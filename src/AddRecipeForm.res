@@ -8,21 +8,63 @@ module Styles = {
   ])
 }
 
+module FormFields = %lenses(
+  type state = {
+    tile: string,
+    ingredients: string,
+    instructions: string,
+  }
+)
+
+module UserForm = ReForm.Make(FormFields)
+
 @react.component
 let make = (~dispatch: Store.action => unit) => {
-  let (title, setTitle) = React.useState(() => "")
-  let (ingredients, setIngredients) = React.useState(() => "")
-  let (instructions, setInstructions) = React.useState(() => "")
-  <div className=CardStyles.formCard>
+   let form: UserForm.api = UserForm.use(
+    ~validationStrategy=OnChange,
+    ~onSubmit={(state) => {
+      Js.log(state)
+
+      None
+    }},
+    ~initialState={
+      tile: "",
+      ingredients: "",
+      instructions: "",
+    },
+    ~schema={
+      open UserForm.Validation
+
+      Schema(
+        nonEmpty(~error="Title is required", Title) +
+        string(~min=3, Title) +
+        nonEmpty(~error="Ingredients is required", Ingredients) +
+        string(~min=3, Ingredients) +
+        nonEmpty(~error="Instructionns is required", Instructionns) +
+        string(~min=3, Instructionns),
+      )
+    },
+    (),
+  )
+
+  <form
+    onSubmit={event => {
+      ReactEvent.Synthetic.preventDefault(event)
+      dispatch(Store.AddRecipe({
+        title: form.values.title,
+        ingredients: form.values.ingredients,
+        instructions: form.values.instructions
+      }))
+      form.submit()
+    }}
+    className=CardStyles.formCard
+    >
     <div>
       <input
         className=Styles.longEntry
         placeholder="Title"
-        value={title}
-        onChange={event => {
-          let title = ReactEvent.Form.target(event)["value"]
-          setTitle(_ => title)
-        }}
+        value={form.values.title}
+        onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Title))}
       />
     </div>
     <div>
@@ -30,11 +72,8 @@ let make = (~dispatch: Store.action => unit) => {
         <h3> {React.string("Ingredients")} </h3>
         <textarea
           className=Styles.longEntry
-          onChange={event => {
-            let ingredients = ReactEvent.Form.target(event)["value"]
-            setIngredients(_ => ingredients)
-          }}
-          value={ingredients}
+          onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Ingredients))}
+          value={form.values.ingredients}
         />
       </label>
     </div>
@@ -43,22 +82,13 @@ let make = (~dispatch: Store.action => unit) => {
         <h3> {React.string("Instructions")} </h3>
         <textarea
           className=Styles.longEntry
-          onChange={event => {
-            let instructions = ReactEvent.Form.target(event)["value"]
-            setInstructions(_ => instructions)
-          }}
-          value={instructions}
+          onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Instructions))}
+          value={form.values.instructions}
         />
       </label>
     </div>
-    <button
-      onClick={_ => {
-        dispatch(
-          Store.AddRecipe({title: title, ingredients: ingredients, instructions: instructions}),
-        )
-        RescriptReactRouter.push(`/recipes/${title}`)
-      }}>
-      {React.string("Add!")}
+    <button className="button" type_="submit" disabled={form.formState === Submitting}>
+      {React.string("Adicionar")}
     </button>
-  </div>
+  </form>
 }
