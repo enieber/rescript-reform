@@ -3,6 +3,8 @@
 import * as CssJs from "bs-css-emotion/src/CssJs.bs.js";
 import * as Curry from "bs-platform/lib/es6/curry.mjs";
 import * as React from "react";
+import * as ReForm from "@rescriptbr/reform/src/ReForm.bs.js";
+import * as ReForm__Helpers from "@rescriptbr/reform/src/ReForm__Helpers.bs.js";
 import * as RescriptReactRouter from "@rescript/react/src/RescriptReactRouter.bs.js";
 import * as CardStyles$RescriptReactIntro from "./CardStyles.bs.js";
 
@@ -29,70 +31,112 @@ var Styles = {
   longEntry: longEntry
 };
 
+function get(values, field) {
+  switch (field) {
+    case /* Title */0 :
+        return values.title;
+    case /* Ingredients */1 :
+        return values.ingredients;
+    case /* Instructions */2 :
+        return values.instructions;
+    
+  }
+}
+
+function set(values, field, value) {
+  switch (field) {
+    case /* Title */0 :
+        return {
+                title: value,
+                ingredients: values.ingredients,
+                instructions: values.instructions
+              };
+    case /* Ingredients */1 :
+        return {
+                title: values.title,
+                ingredients: value,
+                instructions: values.instructions
+              };
+    case /* Instructions */2 :
+        return {
+                title: values.title,
+                ingredients: values.ingredients,
+                instructions: value
+              };
+    
+  }
+}
+
+var FormFields = {
+  get: get,
+  set: set
+};
+
+var UserForm = ReForm.Make({
+      set: set,
+      get: get
+    });
+
 function AddRecipeForm(Props) {
   var dispatch = Props.dispatch;
-  var match = React.useState(function () {
-        return "";
-      });
-  var setTitle = match[1];
-  var title = match[0];
-  var match$1 = React.useState(function () {
-        return "";
-      });
-  var setIngredients = match$1[1];
-  var ingredients = match$1[0];
-  var match$2 = React.useState(function () {
-        return "";
-      });
-  var setInstructions = match$2[1];
-  var instructions = match$2[0];
-  return React.createElement("div", {
-              className: CardStyles$RescriptReactIntro.formCard
+  var form = Curry._7(UserForm.use, {
+        title: "",
+        ingredients: "",
+        instructions: ""
+      }, /* Schema */{
+        _0: Curry._2(UserForm.ReSchema.Validation.$plus, Curry._2(UserForm.ReSchema.Validation.$plus, Curry._2(UserForm.ReSchema.Validation.$plus, Curry._2(UserForm.ReSchema.Validation.$plus, Curry._2(UserForm.ReSchema.Validation.$plus, Curry._3(UserForm.ReSchema.Validation.nonEmpty, "Title is required", undefined, /* Title */0), Curry._6(UserForm.ReSchema.Validation.string, 3, undefined, undefined, undefined, undefined, /* Title */0)), Curry._3(UserForm.ReSchema.Validation.nonEmpty, "Ingredients is required", undefined, /* Ingredients */1)), Curry._6(UserForm.ReSchema.Validation.string, 3, undefined, undefined, undefined, undefined, /* Ingredients */1)), Curry._3(UserForm.ReSchema.Validation.nonEmpty, "Instructionns is required", undefined, /* Instructions */2)), Curry._6(UserForm.ReSchema.Validation.string, 3, undefined, undefined, undefined, undefined, /* Instructions */2))
+      }, (function (state) {
+          console.log(state);
+          
+        }), undefined, undefined, /* OnChange */0, undefined);
+  var partial_arg = Curry._1(form.handleChange, /* Title */0);
+  var partial_arg$1 = Curry._1(form.handleChange, /* Ingredients */1);
+  var partial_arg$2 = Curry._1(form.handleChange, /* Instructions */2);
+  return React.createElement("form", {
+              className: CardStyles$RescriptReactIntro.formCard,
+              onSubmit: (function ($$event) {
+                  $$event.preventDefault();
+                  Curry._1(dispatch, {
+                        TAG: /* AddRecipe */0,
+                        title: form.values.title,
+                        ingredients: form.values.ingredients,
+                        instructions: form.values.instructions
+                      });
+                  RescriptReactRouter.push("/recipes/" + form.values.title);
+                  return Curry._1(form.submit, undefined);
+                })
             }, React.createElement("div", undefined, React.createElement("input", {
                       className: longEntry,
                       placeholder: "Title",
-                      value: title,
-                      onChange: (function ($$event) {
-                          var title = $$event.target.value;
-                          return Curry._1(setTitle, (function (param) {
-                                        return title;
-                                      }));
+                      value: form.values.title,
+                      onChange: (function (param) {
+                          return ReForm__Helpers.handleChange(partial_arg, param);
                         })
                     })), React.createElement("div", undefined, React.createElement("label", undefined, React.createElement("h3", undefined, "Ingredients"), React.createElement("textarea", {
                           className: longEntry,
-                          value: ingredients,
-                          onChange: (function ($$event) {
-                              var ingredients = $$event.target.value;
-                              return Curry._1(setIngredients, (function (param) {
-                                            return ingredients;
-                                          }));
+                          value: form.values.ingredients,
+                          onChange: (function (param) {
+                              return ReForm__Helpers.handleChange(partial_arg$1, param);
                             })
                         }))), React.createElement("div", undefined, React.createElement("label", undefined, React.createElement("h3", undefined, "Instructions"), React.createElement("textarea", {
                           className: longEntry,
-                          value: instructions,
-                          onChange: (function ($$event) {
-                              var instructions = $$event.target.value;
-                              return Curry._1(setInstructions, (function (param) {
-                                            return instructions;
-                                          }));
+                          value: form.values.instructions,
+                          onChange: (function (param) {
+                              return ReForm__Helpers.handleChange(partial_arg$2, param);
                             })
                         }))), React.createElement("button", {
-                  onClick: (function (param) {
-                      Curry._1(dispatch, {
-                            TAG: /* AddRecipe */0,
-                            title: title,
-                            ingredients: ingredients,
-                            instructions: instructions
-                          });
-                      return RescriptReactRouter.push("/recipes/" + title);
-                    })
-                }, "Add!"));
+                  className: "button",
+                  disabled: form.formState === /* Submitting */1,
+                  type: "submit"
+                }, "Adicionar"));
 }
 
 var make = AddRecipeForm;
 
 export {
   Styles ,
+  FormFields ,
+  UserForm ,
   make ,
   
 }

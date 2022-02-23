@@ -10,7 +10,7 @@ module Styles = {
 
 module FormFields = %lenses(
   type state = {
-    tile: string,
+    title: string,
     ingredients: string,
     instructions: string,
   }
@@ -28,7 +28,7 @@ let make = (~dispatch: Store.action => unit) => {
       None
     }},
     ~initialState={
-      tile: "",
+      title: "",
       ingredients: "",
       instructions: "",
     },
@@ -40,8 +40,8 @@ let make = (~dispatch: Store.action => unit) => {
         string(~min=3, Title) +
         nonEmpty(~error="Ingredients is required", Ingredients) +
         string(~min=3, Ingredients) +
-        nonEmpty(~error="Instructionns is required", Instructionns) +
-        string(~min=3, Instructionns),
+        nonEmpty(~error="Instructionns is required", Instructions) +
+        string(~min=3, Instructions),
       )
     },
     (),
@@ -55,6 +55,7 @@ let make = (~dispatch: Store.action => unit) => {
         ingredients: form.values.ingredients,
         instructions: form.values.instructions
       }))
+      RescriptReactRouter.push(`/recipes/${form.values.title}`)
       form.submit()
     }}
     className=CardStyles.formCard
