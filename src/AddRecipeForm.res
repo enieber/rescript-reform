@@ -1,12 +1,4 @@
-module Styles = {
-  open CssJs
-  let longEntry = style(. [
-    width(100.0->#percent),
-    maxWidth(20.0->#rem),
-    borderRadius(0.5->#rem),
-    padding(0.5->#rem),
-  ])
-}
+
 
 module FormFields = %lenses(
   type state = {
@@ -38,6 +30,8 @@ let make = (~dispatch: Store.action => unit) => {
       Schema(
         nonEmpty(~error="Title is required", Title) +
         string(~min=3, Title) +
+        custom(state => state.title == state.ingredients ? Error("Title not be equal igredient"): Valid, Title) + 
+        custom(state => state.title == state.ingredients ? Error("Ingredients not be equal titles"): Valid, Ingredients) + 
         nonEmpty(~error="Ingredients is required", Ingredients) +
         string(~min=3, Ingredients) +
         nonEmpty(~error="Instructionns is required", Instructions) +
@@ -46,6 +40,24 @@ let make = (~dispatch: Store.action => unit) => {
     },
     (),
   )
+  let errorInTitle = switch form.getFieldError(Field(Title)) {
+    | Some(s) => s
+    | None => ""
+  }
+  let errorInInstructions = switch form.getFieldError(Field(Instructions)) {
+    | Some(s) => s
+    | None => ""
+  }
+  let errorInIngredients = switch form.getFieldError(Field(Ingredients)) {
+    | Some(s) => s
+    | None => ""
+  }
+
+let isDisabled = Belt.Option.isSome(form.getFieldError(Field(Title))) || 
+Belt.Option.isSome(form.getFieldError(Field(Instructions))) || 
+Belt.Option.isSome(form.getFieldError(Field(Ingredients)))
+
+  let isDisabledSubmit = isDisabled
 
   <form
     onSubmit={event => {
@@ -62,33 +74,33 @@ let make = (~dispatch: Store.action => unit) => {
     >
     <div>
       <input
-        className=Styles.longEntry
         placeholder="Title"
         value={form.values.title}
         onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Title))}
       />
+        <h4> {React.string(errorInTitle)} </h4>
     </div>
     <div>
       <label>
         <h3> {React.string("Ingredients")} </h3>
         <textarea
-          className=Styles.longEntry
           onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Ingredients))}
           value={form.values.ingredients}
         />
+        <h4> {React.string(errorInIngredients)} </h4>
       </label>
     </div>
     <div>
       <label>
         <h3> {React.string("Instructions")} </h3>
         <textarea
-          className=Styles.longEntry
           onChange={ReForm.Helpers.handleChange(form.handleChange(FormFields.Instructions))}
           value={form.values.instructions}
         />
+        <h4> {React.string(errorInInstructions)} </h4>
       </label>
     </div>
-    <button className="button" type_="submit" disabled={form.formState === Submitting}>
+    <button className="button" type_="submit" disabled={isDisabledSubmit}>
       {React.string("Adicionar")}
     </button>
   </form>

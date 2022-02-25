@@ -29,6 +29,7 @@
     "bs-css",
     "bs-css-emotion",
     "@rescriptbr/reform",
-    "reschema"
+    "reschema",
+    "@rescriptbr/ancestor"
   ]
 }
